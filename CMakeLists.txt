@@ -39,5 +39,6 @@ set(PYBIND11_CPP_STANDARD -std=c++17)
 add_subdirectory(pybind11)
 pybind11_add_module(_pybind11_gdal pybind11.cpp)
 
-target_compile_definitions(_pybind11_gdal PRIVATE VERSION_INFO=${GDAL_VERSION_INFO})
+target_compile_definitions(_pybind11_gdal
+                           PRIVATE VERSION_INFO=${GDAL_VERSION_INFO})
 target_link_libraries(_pybind11_gdal PRIVATE ${PROJECT_NAME})
