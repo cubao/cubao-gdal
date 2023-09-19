@@ -32,7 +32,15 @@ set(WITH_GZFILEOP ON)
 # set(WITH_NEW_STRATEGIES OFF)
 set(WITH_GTEST OFF)
 add_subdirectory(zlib-ng)
+
 add_subdirectory(sqlite)
+
+set(BUILD_PROJSYNC OFF)
+set(BUILD_TESTING OFF)
+set(ENABLE_CURL OFF)
+set(ENABLE_TIFF OFF)
+set(BUILD_TESTING OFF)
+add_subdirectory(PROJ)
 
 set(PYBIND11_CPP_STANDARD -std=c++17)
 add_subdirectory(pybind11)
