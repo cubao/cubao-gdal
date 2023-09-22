@@ -24,23 +24,77 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 endif()
 
-include(FetchContent)
-set(ZLIB_COMPAT ON)
-set(ZLIB_ENABLE_TESTS OFF)
-set(ZLIBNG_ENABLE_TESTS OFF)
-set(WITH_GZFILEOP ON)
-# set(WITH_NEW_STRATEGIES OFF)
-set(WITH_GTEST OFF)
-add_subdirectory(zlib-ng)
+if(NOT CMAKE_INSTALL_PREFIX)
+  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+endif()
 
-add_subdirectory(sqlite)
+macro(print_include_directories)
+  get_property(
+    dirs
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY INCLUDE_DIRECTORIES)
+  message(STATUS "all include directories:")
+  foreach(dir ${dirs})
+    message(STATUS "-   ${dir}")
+  endforeach()
+endmacro()
 
-set(BUILD_PROJSYNC OFF)
-set(BUILD_TESTING OFF)
-set(ENABLE_CURL OFF)
-set(ENABLE_TIFF OFF)
-set(BUILD_TESTING OFF)
-add_subdirectory(PROJ)
+macro(print_all_linked_libraries target)
+  get_target_property(libs ${target} LINK_LIBRARIES)
+  message(STATUS "all linked libraries: (against ${target})")
+  foreach(lib ${libs})
+    message(STATUS "-   ${lib}")
+  endforeach()
+endmacro()
+
+macro(print_all_variables)
+  get_cmake_property(vars VARIABLES)
+  list(SORT vars)
+  message(STATUS "all variables:")
+  foreach(var ${vars})
+    message(STATUS "-   ${var}=${${var}}")
+  endforeach()
+endmacro()
+
+set(EXTERNAL_PROJECT_ADD_CMAKE_ARGS
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    #
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    #
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_C_COMPILER_TARGET=${CMAKE_C_COMPILER_TARGET}
+    -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_CXX_COMPILER_TARGET=${CMAKE_CXX_COMPILER_TARGET}
+    -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+    -DCMAKE_LINKER=${CMAKE_LINKER}
+    -DCMAKE_AR=${CMAKE_AR}
+    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+    -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
+    -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_REAL_PATH})
+
+include(ExternalProject)
+ExternalProject_Add(
+  cudao_zlib
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/zlib-ng
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} #
+             -DZLIB_COMPAT=ON #
+             -DZLIB_ENABLE_TESTS=OFF #
+             -DZLIBNG_ENABLE_TESTS=OFF #
+             -DWITH_GZFILEOP=ON #
+             -DWITH_GTEST=OFF)
+print_all_variables()
+# ExternalProject_Get_Property(cubao_zlib binary_dir) message(FATAL_ERROR
+# "Done")
+
+# add_subdirectory(sqlite)
+
+# set(BUILD_PROJSYNC OFF) set(BUILD_TESTING OFF) set(ENABLE_CURL OFF)
+# set(ENABLE_TIFF OFF) set(BUILD_TESTING OFF) add_subdirectory(PROJ)
 
 set(PYBIND11_CPP_STANDARD -std=c++17)
 add_subdirectory(pybind11)
