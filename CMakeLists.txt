@@ -78,7 +78,7 @@ set(EXTERNAL_PROJECT_ADD_CMAKE_ARGS
 
 include(ExternalProject)
 ExternalProject_Add(
-  cudao_zlib
+  cubao_zlib
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/zlib-ng
   CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} #
@@ -87,6 +87,13 @@ ExternalProject_Add(
              -DZLIBNG_ENABLE_TESTS=OFF #
              -DWITH_GZFILEOP=ON #
              -DWITH_GTEST=OFF)
+
+ExternalProject_Add(
+  cubao_sqlite
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/sqlite
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
+
 print_all_variables()
 # ExternalProject_Get_Property(cubao_zlib binary_dir) message(FATAL_ERROR
 # "Done")

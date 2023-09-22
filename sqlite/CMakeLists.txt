@@ -23,8 +23,8 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 
 set(HEADER_ROOT "${PROJECT_SOURCE_DIR}")
-file(GLOB_RECURSE HEADERS *.h)
-file(GLOB_RECURSE SOURCES sqlite3.c)
+set(HEADERS sqlite3.h sqlite3ext.h)
+set(SOURCES sqlite3.c)
 add_library(${PROJECT_NAME} ${SOURCES})
 install(
   TARGETS ${PROJECT_NAME}
