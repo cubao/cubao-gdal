@@ -126,17 +126,27 @@ ExternalProject_Add(
              #
              -DGDAL_SET_INSTALL_RELATIVE_RPATH=ON
              #
+             -DGDAL_USE_INTERNAL_LIBS=ON
+             -DGDAL_USE_EXTERNAL_LIBS=OFF
+             #
+             -DGDAL_USE_CRYPTOPP=OFF
+             -DGDAL_USE_CURL=OFF
+             -DGDAL_IGNORE_FAILED_CONDITIONS=ON
+             -DGDAL_USE_GEOS=OFF
              -DGDAL_USE_GEOTIFF_INTERNAL=ON
              -DGDAL_USE_GIF_INTERNAL=ON
+             -DGDAL_USE_JPEG12_INTERNAL=ON
              -DGDAL_USE_JPEG_INTERNAL=ON
              -DGDAL_USE_JSONC_INTERNAL=ON
              -DGDAL_USE_LERC_INTERNAL=ON
              -DGDAL_USE_PNG_INTERNAL=ON
+             -DGDAL_USE_QHULL_INTERNAL=ON
              -DGDAL_USE_SHAPELIB_INTERNAL=ON
-             -DGDAL_USE_TIFF_INTERNAL=ON
-             -DGDAL_USE_ZLIB_INTERNAL=ON
-             -DGDAL_USE_CURL=OFF
              -DGDAL_USE_SQLITE3=OFF
+             -DGDAL_USE_TIFF_INTERNAL=ON
+             -DGDAL_USE_XERCESC=OFF
+             -DGDAL_USE_ZLIB_INTERNAL=ON
+             -DHAVE_JPEGTURBO_DUAL_MODE_8_12=ON
              #
              -DBUILD_DOCS=OFF)
 
