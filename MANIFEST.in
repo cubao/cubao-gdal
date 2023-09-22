@@ -4,4 +4,5 @@ graft pybind11/tools
 graft PROJ
 graft gdal
 graft sqlite
-global-include CMakeLists.txt *.cmake
+graft zlib-ng
+include pybind11.cpp CMakeLists.txt
