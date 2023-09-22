@@ -98,21 +98,39 @@ ExternalProject_Add(
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/sqlite
   CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
 
-# ExternalProject_Add( tiff PREFIX ${CMAKE_CURRENT_BINARY_DIR} SOURCE_DIR
-# ${PROJECT_SOURCE_DIR}/libtiff CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
-
 ExternalProject_Add(
   proj
-  DEPENDS sqlite3 tiff
+  DEPENDS sqlite3
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/PROJ
   CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} -DNLOHMANN_JSON_ORIGIN=internal
              -DENABLE_TIFF=OFF -DENABLE_CURL=OFF -DBUILD_EXAMPLES=OFF
              -DBUILD_PROJSYNC=OFF)
 
-# ExternalProject_Add( cubao_geotiff PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-# SOURCE_DIR ${PROJECT_SOURCE_DIR}/libgeotiff/libgeotiff CMAKE_ARGS
-# ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
+ExternalProject_Add(
+  gdal
+  DEPENDS proj
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/gdal
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS}
+             # gdal/gdal.cmake
+             -DBUILD_PYTHON_BINDINGS=OFF
+             -DGDAL_HIDE_INTERNAL_SYMBOLS=ON
+             -DGDAL_ENABLE_PLUGINS_NO_DEPS=ON
+             #
+             -DGDAL_SET_INSTALL_RELATIVE_RPATH=ON
+             #
+             -DGDAL_USE_GEOTIFF_INTERNAL=ON
+             -DGDAL_USE_GIF_INTERNAL=ON
+             -DGDAL_USE_JPEG_INTERNAL=ON
+             -DGDAL_USE_JSONC_INTERNAL=ON
+             -DGDAL_USE_LERC_INTERNAL=ON
+             -DGDAL_USE_PNG_INTERNAL=ON
+             -DGDAL_USE_SHAPELIB_INTERNAL=ON
+             -DGDAL_USE_TIFF_INTERNAL=ON
+             -DGDAL_USE_ZLIB_INTERNAL=ON
+             #
+             -DBUILD_DOCS=OFF)
 
 print_all_variables()
 # ExternalProject_Get_Property(cubao_zlib binary_dir) message(FATAL_ERROR
