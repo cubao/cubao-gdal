@@ -105,8 +105,11 @@ ExternalProject_Add(
   DEPENDS sqlite3
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/PROJ
-  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} -DNLOHMANN_JSON_ORIGIN=internal
-             -DENABLE_TIFF=OFF -DENABLE_CURL=OFF -DBUILD_EXAMPLES=OFF
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} #
+             -DNLOHMANN_JSON_ORIGIN=internal #
+             -DENABLE_TIFF=OFF #
+             -DENABLE_CURL=OFF #
+             -DBUILD_EXAMPLES=OFF #
              -DBUILD_PROJSYNC=OFF)
 
 ExternalProject_Add(
@@ -132,6 +135,8 @@ ExternalProject_Add(
              -DGDAL_USE_SHAPELIB_INTERNAL=ON
              -DGDAL_USE_TIFF_INTERNAL=ON
              -DGDAL_USE_ZLIB_INTERNAL=ON
+             -DGDAL_USE_CURL=OFF
+             -DGDAL_USE_SQLITE3=OFF
              #
              -DBUILD_DOCS=OFF)
 
