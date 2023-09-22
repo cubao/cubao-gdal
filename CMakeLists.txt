@@ -94,6 +94,18 @@ ExternalProject_Add(
   SOURCE_DIR ${PROJECT_SOURCE_DIR}/sqlite
   CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
 
+ExternalProject_Add(
+  cubao_tiff
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/libtiff
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
+
+# ExternalProject_Add(
+#   cubao_proj
+#   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+#   SOURCE_DIR ${PROJECT_SOURCE_DIR}/PROJ
+#   CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
+
 print_all_variables()
 # ExternalProject_Get_Property(cubao_zlib binary_dir) message(FATAL_ERROR
 # "Done")
