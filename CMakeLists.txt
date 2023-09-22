@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(cubao_gdal)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
@@ -118,6 +118,7 @@ ExternalProject_Add(
              # gdal/gdal.cmake
              -DBUILD_PYTHON_BINDINGS=OFF
              -DGDAL_HIDE_INTERNAL_SYMBOLS=ON
+             -DGDAL_OBJECT_LIBRARIES_POSITION_INDEPENDENT_CODE=ON
              -DGDAL_ENABLE_PLUGINS_NO_DEPS=ON
              #
              -DGDAL_SET_INSTALL_RELATIVE_RPATH=ON
@@ -134,16 +135,7 @@ ExternalProject_Add(
              #
              -DBUILD_DOCS=OFF)
 
-print_all_variables()
-# ExternalProject_Get_Property(cubao_zlib binary_dir) message(FATAL_ERROR
-# "Done")
-
-# add_subdirectory(sqlite)
-
-# set(BUILD_PROJSYNC OFF) set(BUILD_TESTING OFF) set(ENABLE_CURL OFF)
-# set(ENABLE_TIFF OFF) set(BUILD_TESTING OFF) add_subdirectory(PROJ)
-
-set(PYBIND11_CPP_STANDARD -std=c++17)
+set(PYBIND11_CPP_STANDARD -std=c++14)
 add_subdirectory(pybind11)
 include_directories(${PYBIND11_INCLUDE_DIR})
 pybind11_add_module(_pybind11_gdal pybind11.cpp)
