@@ -56,7 +56,7 @@ PYTHON ?= python3
 python_install:
 	$(PYTHON) setup.py install
 python_build:
-	$(PYTHON) setup.py bdist_wheel
+	$(PYTHON) setup.py bdist_wheel --verbose
 python_sdist:
 	$(PYTHON) setup.py sdist
 python_test: pytest
