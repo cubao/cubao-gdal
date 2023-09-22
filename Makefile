@@ -2,7 +2,7 @@ PROJECT_SOURCE_DIR ?= $(abspath ./)
 BUILD_DIR ?= $(PROJECT_SOURCE_DIR)/build
 INSTALL_DIR ?= $(BUILD_DIR)/install
 PROJECT_NAME ?= $(shell basename $(PROJECT_SOURCE_DIR))
-NUM_JOB ?= 8
+NUM_JOB ?= 20
 
 all:
 	@echo nothing special
