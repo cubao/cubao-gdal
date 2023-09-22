@@ -1,3 +1,4 @@
 build
 dist
 *.egg-info/
+cubao_gdal-*

@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.4...3.18)
 project(cubao_gdal)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 set(BUILD_SHARED_LIBS OFF)
+set(BUILD_TESTING OFF)
 include_directories(BEFORE ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR})
 
 if(NOT CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
@@ -24,25 +25,133 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 endif()
 
-include(FetchContent)
-set(ZLIB_COMPAT ON)
-set(ZLIB_ENABLE_TESTS OFF)
-set(ZLIBNG_ENABLE_TESTS OFF)
-set(WITH_GZFILEOP ON)
-# set(WITH_NEW_STRATEGIES OFF)
-set(WITH_GTEST OFF)
-add_subdirectory(zlib-ng)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+set(ENV{PATH} "${CMAKE_INSTALL_PREFIX}/bin:$ENV{PATH}")
 
-add_subdirectory(sqlite)
+macro(print_include_directories)
+  get_property(
+    dirs
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY INCLUDE_DIRECTORIES)
+  message(STATUS "all include directories:")
+  foreach(dir ${dirs})
+    message(STATUS "-   ${dir}")
+  endforeach()
+endmacro()
 
-set(BUILD_PROJSYNC OFF)
-set(BUILD_TESTING OFF)
-set(ENABLE_CURL OFF)
-set(ENABLE_TIFF OFF)
-set(BUILD_TESTING OFF)
-add_subdirectory(PROJ)
+macro(print_all_linked_libraries target)
+  get_target_property(libs ${target} LINK_LIBRARIES)
+  message(STATUS "all linked libraries: (against ${target})")
+  foreach(lib ${libs})
+    message(STATUS "-   ${lib}")
+  endforeach()
+endmacro()
 
-set(PYBIND11_CPP_STANDARD -std=c++17)
+macro(print_all_variables)
+  get_cmake_property(vars VARIABLES)
+  list(SORT vars)
+  message(STATUS "all variables:")
+  foreach(var ${vars})
+    message(STATUS "-   ${var}=${${var}}")
+  endforeach()
+endmacro()
+
+set(EXTERNAL_PROJECT_ADD_CMAKE_ARGS
+    -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=${CMAKE_EXPORT_COMPILE_COMMANDS}
+    -DCMAKE_POSITION_INDEPENDENT_CODE=${CMAKE_POSITION_INDEPENDENT_CODE}
+    -DBUILD_TESTING=${BUILD_TESTING}
+    #
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    #
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_C_COMPILER_TARGET=${CMAKE_C_COMPILER_TARGET}
+    -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DCMAKE_CXX_COMPILER_TARGET=${CMAKE_CXX_COMPILER_TARGET}
+    -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+    -DCMAKE_LINKER=${CMAKE_LINKER}
+    -DCMAKE_AR=${CMAKE_AR}
+    -DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}
+    -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR}
+    -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_REAL_PATH})
+
+include(ExternalProject)
+ExternalProject_Add(
+  zlib
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/zlib-ng
+  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} #
+             -DZLIB_COMPAT=ON #
+             -DZLIB_ENABLE_TESTS=OFF #
+             -DZLIBNG_ENABLE_TESTS=OFF #
+             -DWITH_GZFILEOP=ON #
+             -DWITH_GTEST=OFF)
+
+ExternalProject_Add(
+  sqlite3
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/sqlite
+  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS})
+
+ExternalProject_Add(
+  proj
+  DEPENDS sqlite3
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/PROJ
+  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS} #
+             -DNLOHMANN_JSON_ORIGIN=internal #
+             -DENABLE_TIFF=OFF #
+             -DENABLE_CURL=OFF #
+             -DBUILD_EXAMPLES=OFF #
+             -DBUILD_PROJSYNC=OFF)
+
+ExternalProject_Add(
+  gdal
+  DEPENDS proj
+  PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+  SOURCE_DIR ${PROJECT_SOURCE_DIR}/gdal
+  INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+  CMAKE_ARGS ${EXTERNAL_PROJECT_ADD_CMAKE_ARGS}
+             # gdal/gdal.cmake
+             -DBUILD_PYTHON_BINDINGS=OFF
+             -DGDAL_HIDE_INTERNAL_SYMBOLS=ON
+             -DGDAL_OBJECT_LIBRARIES_POSITION_INDEPENDENT_CODE=ON
+             -DGDAL_ENABLE_PLUGINS_NO_DEPS=ON
+             #
+             -DGDAL_SET_INSTALL_RELATIVE_RPATH=ON
+             #
+             -DGDAL_USE_INTERNAL_LIBS=ON
+             -DGDAL_USE_EXTERNAL_LIBS=OFF
+             #
+             -DGDAL_USE_CRYPTOPP=OFF
+             -DGDAL_USE_CURL=OFF
+             -DGDAL_IGNORE_FAILED_CONDITIONS=ON
+             -DGDAL_USE_GEOS=OFF
+             -DGDAL_USE_GEOTIFF_INTERNAL=ON
+             -DGDAL_USE_GIF_INTERNAL=ON
+             -DGDAL_USE_JPEG12_INTERNAL=ON
+             -DGDAL_USE_JPEG_INTERNAL=ON
+             -DGDAL_USE_JSONC_INTERNAL=ON
+             -DGDAL_USE_LERC_INTERNAL=ON
+             -DGDAL_USE_PNG_INTERNAL=ON
+             -DGDAL_USE_QHULL_INTERNAL=ON
+             -DGDAL_USE_SHAPELIB_INTERNAL=ON
+             -DGDAL_USE_SQLITE3=OFF
+             -DGDAL_USE_TIFF_INTERNAL=ON
+             -DGDAL_USE_XERCESC=OFF
+             -DGDAL_USE_ZLIB_INTERNAL=ON
+             -DHAVE_JPEGTURBO_DUAL_MODE_8_12=ON
+             #
+             -DBUILD_DOCS=OFF)
+
+set(PYBIND11_CPP_STANDARD -std=c++14)
 add_subdirectory(pybind11)
 include_directories(${PYBIND11_INCLUDE_DIR})
 pybind11_add_module(_pybind11_gdal pybind11.cpp)

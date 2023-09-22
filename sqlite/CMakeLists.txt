@@ -23,8 +23,8 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 
 set(HEADER_ROOT "${PROJECT_SOURCE_DIR}")
-file(GLOB_RECURSE HEADERS *.h)
-file(GLOB_RECURSE SOURCES sqlite3.c)
+set(HEADERS sqlite3.h sqlite3ext.h)
+set(SOURCES sqlite3.c)
 add_library(${PROJECT_NAME} ${SOURCES})
 install(
   TARGETS ${PROJECT_NAME}
@@ -35,6 +35,7 @@ foreach(file ${HEADERS})
   install(FILES ${file} DESTINATION include)
 endforeach()
 
-add_executable(sqlite shell.c)
-target_link_libraries(sqlite ${PROJECT_NAME} pthread dl)
-install(TARGETS sqlite RUNTIME DESTINATION bin)
+add_executable(sqlite3_exe shell.c)
+target_link_libraries(sqlite3_exe ${PROJECT_NAME} pthread dl)
+set_target_properties(sqlite3_exe PROPERTIES OUTPUT_NAME sqlite3)
+install(TARGETS sqlite3_exe RUNTIME DESTINATION bin)
